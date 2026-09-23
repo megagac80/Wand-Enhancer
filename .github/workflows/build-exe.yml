@@ -1,6 +1,6 @@
-name: Build Windows Installer
+name: Build PowerShell Executable
 on:
-  workflow_dispatch: # Allows you to manually trigger the build with a single click
+  workflow_dispatch: # Allows manual trigger with one click
 
 jobs:
   build:
@@ -10,27 +10,18 @@ jobs:
       - name: Checkout repository code
         uses: actions/checkout@v4
 
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 20
-
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Build Electron Executable
+      - name: Run Build Script
+        shell: pwsh
         run: |
-          if (Select-String -Path package.json -Pattern '"package"') { npm run package }
-          elseif (Select-String -Path package.json -Pattern '"build"') { npm run build }
-          elseif (Select-String -Path package.json -Pattern '"dist"') { npm run dist }
-          else { npm run package }
-        shell: powershell
+          ./build.ps1
 
-      - name: Upload Installer Executable
+      - name: Upload Finished Artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: windows-app-installer
+          name: compiled-application
           path: |
+            *.exe
             dist/**/*.exe
+            build/**/*.exe
             out/**/*.exe
+            bin/**/*.exe
